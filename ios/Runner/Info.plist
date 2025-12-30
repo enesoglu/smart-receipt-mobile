@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Bu uygulama fişlerinizi taramak için kameraya erişim gerektirir.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Bu uygulama fiş fotoğraflarınızı seçmek için fotoğraf galerisine erişim gerektirir.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
