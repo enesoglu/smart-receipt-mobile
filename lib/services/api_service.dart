@@ -256,6 +256,78 @@ class ApiService {
     }
   }
 
+  // ==================== CATEGORIES ====================
+
+  Future<ApiResponse<List<Category>>> getCategories() async {
+    try {
+      final response = await _dio.get('/categories');
+
+      return ApiResponse<List<Category>>.fromJson(
+        response.data,
+        (json) => (json as List).map((e) => Category.fromJson(e)).toList(),
+      );
+    } on DioException catch (e) {
+      return ApiResponse(
+        success: false,
+        message: _getErrorMessage(e),
+      );
+    }
+  }
+
+  Future<ApiResponse<Category>> createCategory(String name, String? description, String? iconName) async {
+    try {
+      final response = await _dio.post('/categories', data: {
+        'name': name,
+        'description': description,
+        'iconName': iconName,
+      });
+
+      return ApiResponse<Category>.fromJson(
+        response.data,
+        (json) => Category.fromJson(json),
+      );
+    } on DioException catch (e) {
+      return ApiResponse(
+        success: false,
+        message: _getErrorMessage(e),
+      );
+    }
+  }
+
+  Future<ApiResponse<void>> deleteCategory(int id) async {
+    try {
+      final response = await _dio.delete('/categories/$id');
+
+      return ApiResponse(
+        success: response.data['success'] ?? true,
+        message: response.data['message'],
+      );
+    } on DioException catch (e) {
+      return ApiResponse(
+        success: false,
+        message: _getErrorMessage(e),
+      );
+    }
+  }
+
+  // ==================== STORES ====================
+
+  Future<ApiResponse<List<Store>>> getStores() async {
+    try {
+      final response = await _dio.get('/stores');
+
+      return ApiResponse<List<Store>>.fromJson(
+        response.data,
+        (json) => (json as List).map((e) => Store.fromJson(e)).toList(),
+      );
+    } on DioException catch (e) {
+      return ApiResponse(
+        success: false,
+        message: _getErrorMessage(e),
+      );
+    }
+  }
+
   // ==================== DASHBOARD & STATS ====================
 
   Future<ApiResponse<DashboardStats>> getDashboardStats() async {
@@ -334,17 +406,17 @@ class ApiService {
   String _getErrorMessage(DioException e) {
     if (e.response != null) {
       if (e.response!.data is Map) {
-        return e.response!.data['message'] ?? 'Bir hata oluştu';
+        return e.response!.data['message'] ?? 'An error occurred';
       }
-      return 'Sunucu hatası: ${e.response!.statusCode}';
+      return 'Server error: ${e.response!.statusCode}';
     }
     if (e.type == DioExceptionType.connectionTimeout) {
-      return 'Bağlantı zaman aşımı';
+      return 'Connection timeout';
     }
     if (e.type == DioExceptionType.connectionError) {
-      return 'Sunucuya bağlanılamadı';
+      return 'Could not connect to server';
     }
-    return 'Bir hata oluştu';
+    return 'An error occurred';
   }
 }
 
@@ -376,6 +448,66 @@ class ApiResponse<T> {
       errors: json['errors'] != null
           ? List<String>.from(json['errors'])
           : null,
+    );
+  }
+}
+
+// ==================== CATEGORIES ====================
+
+class Category {
+  final int id;
+  final String name;
+  final String? description;
+  final String? iconName;
+
+  Category({
+    required this.id,
+    required this.name,
+    this.description,
+    this.iconName,
+  });
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'],
+      iconName: json['iconName'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'iconName': iconName,
+    };
+  }
+}
+
+class Store {
+  final int id;
+  final String name;
+  final String? address;
+  final String? phone;
+  final String? taxNumber;
+
+  Store({
+    required this.id,
+    required this.name,
+    this.address,
+    this.phone,
+    this.taxNumber,
+  });
+
+  factory Store.fromJson(Map<String, dynamic> json) {
+    return Store(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      address: json['address'],
+      phone: json['phone'],
+      taxNumber: json['taxNumber'],
     );
   }
 }

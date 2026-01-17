@@ -34,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
-        _errorMessage = 'Şifreler eşleşmiyor';
+        _errorMessage = 'Passwords do not match';
       });
       return;
     }
@@ -57,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Kayıt başarılı! Şimdi giriş yapabilirsiniz.'),
+            content: Text('Registration successful! You can now log in.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -68,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } else {
       setState(() {
-        _errorMessage = response.message ?? 'Kayıt başarısız';
+        _errorMessage = response.message ?? 'Registration failed';
       });
     }
   }

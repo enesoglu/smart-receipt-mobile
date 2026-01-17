@@ -56,10 +56,10 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {
       _filteredReceipts = _receipts.where((receipt) {
         final storeLower = receipt.storeName.toLowerCase();
-        final tagsLower = (receipt.tags ?? '').toLowerCase();
+        final categoryLower = (receipt.categoryName ?? '').toLowerCase();
         final searchLower = query.toLowerCase();
 
-        return storeLower.contains(searchLower) || tagsLower.contains(searchLower);
+        return storeLower.contains(searchLower) || categoryLower.contains(searchLower);
       }).toList();
     });
   }
@@ -72,7 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Ara',
+          'Search',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -90,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _searchController,
               onChanged: _filterReceipts,
               decoration: InputDecoration(
-                hintText: 'Mağaza veya etiket ara...',
+                hintText: 'Search by store or category...',
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -132,7 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             const SizedBox(height: 16),
                             Text(
                               _searchController.text.isEmpty
-                                  ? 'Henüz fiş eklenmemiş'
+                                  ? 'No receipts added yet'
                                   : 'Sonuç bulunamadı',
                               style: TextStyle(
                                 fontSize: 16,
@@ -205,29 +205,24 @@ class _SearchScreenState extends State<SearchScreen> {
                     color: Colors.grey[600],
                   ),
                 ),
-                if (receipt.tags != null && receipt.tags!.isNotEmpty) ...[
+                if (receipt.categoryName != null && receipt.categoryName!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 4,
-                    children: receipt.tagsList.take(3).map((tag) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          tag,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.blue[700],
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      receipt.categoryName!,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.blue[700],
+                      ),
+                    ),
                   ),
                 ],
               ],

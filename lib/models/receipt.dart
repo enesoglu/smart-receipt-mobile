@@ -4,7 +4,8 @@ class Receipt {
   final DateTime date;
   final double totalAmount;
   final String? imagePath;
-  final String? tags;
+  final int? categoryId;
+  final String? categoryName;
   final List<ReceiptItem> items;
 
   Receipt({
@@ -13,7 +14,8 @@ class Receipt {
     required this.date,
     required this.totalAmount,
     this.imagePath,
-    this.tags,
+    this.categoryId,
+    this.categoryName,
     this.items = const [],
   });
 
@@ -24,7 +26,8 @@ class Receipt {
       date: DateTime.tryParse(json['date']?.toString() ?? '') ?? DateTime.now(),
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
       imagePath: json['imagePath'],
-      tags: json['tags'],
+      categoryId: json['categoryId'],
+      categoryName: json['categoryName'],
       items: json['items'] != null
           ? (json['items'] as List).map((e) => ReceiptItem.fromJson(e)).toList()
           : [],
@@ -38,7 +41,7 @@ class Receipt {
       'date': date.toIso8601String(),
       'totalAmount': totalAmount,
       'imagePath': imagePath,
-      'tags': tags,
+      'categoryId': categoryId,
       'items': items.map((e) => e.toJson()).toList(),
     };
   }
@@ -49,11 +52,6 @@ class Receipt {
 
   String get formattedAmount {
     return '${totalAmount.toStringAsFixed(2)} ₺';
-  }
-
-  List<String> get tagsList {
-    if (tags == null || tags!.isEmpty) return [];
-    return tags!.split(',').map((e) => e.trim()).toList();
   }
 }
 
@@ -90,7 +88,7 @@ class CreateReceiptRequest {
   final DateTime date;
   final double totalAmount;
   final String? imagePath;
-  final String? tags;
+  final int? categoryId;
   final List<ReceiptItem> items;
 
   CreateReceiptRequest({
@@ -98,7 +96,7 @@ class CreateReceiptRequest {
     required this.date,
     required this.totalAmount,
     this.imagePath,
-    this.tags,
+    this.categoryId,
     this.items = const [],
   });
 
@@ -108,7 +106,7 @@ class CreateReceiptRequest {
       'date': date.toIso8601String(),
       'totalAmount': totalAmount,
       'imagePath': imagePath,
-      'tags': tags,
+      'categoryId': categoryId,
       'items': items.map((e) => e.toJson()).toList(),
     };
   }

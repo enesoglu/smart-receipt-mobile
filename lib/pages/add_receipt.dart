@@ -17,18 +17,37 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
 
   final _storeNameController = TextEditingController();
   final _totalAmountController = TextEditingController();
-  final _tagsController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
   bool _isLoading = false;
 
+  // Category and Store support
+  List<Category> _categories = [];
+  List<Store> _stores = [];
+  int? _selectedCategoryId;
+
   @override
   void initState() {
     super.initState();
+    _loadCategoriesAndStores();
     // If we have scanned text, try to extract data
     if (widget.scannedText != null) {
       _parseScannedText(widget.scannedText!);
     }
+  }
+
+  Future<void> _loadCategoriesAndStores() async {
+    final categoriesResponse = await _apiService.getCategories();
+    final storesResponse = await _apiService.getStores();
+
+    setState(() {
+      if (categoriesResponse.success && categoriesResponse.data != null) {
+        _categories = categoriesResponse.data!;
+      }
+      if (storesResponse.success && storesResponse.data != null) {
+        _stores = storesResponse.data!;
+      }
+    });
   }
 
   void _parseScannedText(String text) {
@@ -174,7 +193,6 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
   void dispose() {
     _storeNameController.dispose();
     _totalAmountController.dispose();
-    _tagsController.dispose();
     super.dispose();
   }
 
@@ -201,7 +219,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
       storeName: _storeNameController.text.trim(),
       date: _selectedDate,
       totalAmount: double.parse(_totalAmountController.text.replaceAll(',', '.')),
-      tags: _tagsController.text.trim().isNotEmpty ? _tagsController.text.trim() : null,
+      categoryId: _selectedCategoryId,
     );
 
     final response = await _apiService.createReceipt(request);
@@ -212,7 +230,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Fiş başarıyla eklendi'),
+            content: Text('Receipt added successfully'),
             backgroundColor: Colors.green,
           ),
         );
@@ -222,7 +240,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response.message ?? 'Fiş eklenirken hata oluştu'),
+            content: Text(response.message ?? 'Error adding receipt'),
             backgroundColor: Colors.red,
           ),
         );
@@ -242,7 +260,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Yeni Fiş Ekle',
+          'Add New Receipt',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -272,7 +290,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
                         Icon(Icons.document_scanner, color: Colors.blue[700]),
                         const SizedBox(width: 8),
                         Text(
-                          'Taranan Metin',
+                          'Scanned Text',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.blue[700],
@@ -317,22 +335,70 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Store name
-                    _buildLabel('Mağaza Adı'),
-                    TextFormField(
-                      controller: _storeNameController,
-                      decoration: _inputDecoration('Örn: Migros, A101, BIM...'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Mağaza adı gerekli';
+                    // Store name with autocomplete
+                    _buildLabel('Store Name'),
+                    Autocomplete<String>(
+                      initialValue: TextEditingValue(text: _storeNameController.text),
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return _stores.map((s) => s.name);
                         }
-                        return null;
+                        return _stores
+                            .where((store) => store.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                            .map((s) => s.name);
+                      },
+                      onSelected: (String selection) {
+                        _storeNameController.text = selection;
+                      },
+                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                        // Sync controller if needed
+                        if (_storeNameController.text.isNotEmpty && controller.text.isEmpty) {
+                          controller.text = _storeNameController.text;
+                        }
+                        return TextFormField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: _inputDecoration('e.g. Walmart, Target, Costco...'),
+                          onChanged: (value) => _storeNameController.text = value,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Store name is required';
+                            }
+                            return null;
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Select from existing stores or type a new name',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Category dropdown
+                    _buildLabel('Category'),
+                    DropdownButtonFormField<int>(
+                      value: _selectedCategoryId,
+                      decoration: _inputDecoration('Select category...'),
+                      items: [
+                        const DropdownMenuItem<int>(
+                          value: null,
+                          child: Text('Select Category...'),
+                        ),
+                        ..._categories.map((cat) => DropdownMenuItem<int>(
+                          value: cat.id,
+                          child: Text(cat.name),
+                        )),
+                      ],
+                      onChanged: (value) {
+                        setState(() => _selectedCategoryId = value);
                       },
                     ),
                     const SizedBox(height: 20),
 
                     // Date
-                    _buildLabel('Tarih'),
+                    _buildLabel('Date'),
                     GestureDetector(
                       onTap: _selectDate,
                       child: Container(
@@ -356,38 +422,23 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
                     const SizedBox(height: 20),
 
                     // Total amount
-                    _buildLabel('Toplam Tutar (₺)'),
+                    _buildLabel('Total Amount (₺)'),
                     TextFormField(
                       controller: _totalAmountController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: _inputDecoration('0.00'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Tutar gerekli';
+                          return 'Amount is required';
                         }
                         final amount = double.tryParse(value.replaceAll(',', '.'));
                         if (amount == null || amount <= 0) {
-                          return 'Geçerli bir tutar girin';
+                          return 'Please enter a valid amount';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
-
-                    // Tags
-                    _buildLabel('Etiketler (isteğe bağlı)'),
-                    TextFormField(
-                      controller: _tagsController,
-                      decoration: _inputDecoration('Örn: Market, Haftalık, Organik...'),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Etiketleri virgülle ayırın',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -430,7 +481,7 @@ class _AddReceiptScreenState extends State<AddReceiptScreen> {
                       ),
                     )
                   : const Text(
-                      'Kaydet',
+                      'Save',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

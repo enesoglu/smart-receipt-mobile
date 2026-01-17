@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_dailySpending.isEmpty) {
       return const SizedBox(
         height: 200,
-        child: Center(child: Text('Veri bulunamadı')),
+        child: Center(child: Text('No data found')),
       );
     }
 
@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Son Fişler',
+          'Recent Receipts',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -415,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(
-              child: Text('Henüz fiş eklenmemiş'),
+              child: Text('No receipts added yet'),
             ),
           )
         else
@@ -464,6 +464,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.grey[600],
                   ),
                 ),
+                if (receipt.categoryName != null && receipt.categoryName!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4A6CFA).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      receipt.categoryName!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Color(0xFF4A6CFA),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

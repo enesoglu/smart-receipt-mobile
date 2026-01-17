@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } else {
       setState(() {
-        _errorMessage = response.message ?? 'Giriş başarısız';
+        _errorMessage = response.message ?? 'Login failed';
       });
     }
   }
@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Kullanıcı adı gerekli';
+                              return 'Username is required';
                             }
                             return null;
                           },
@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Şifre gerekli';
+                              return 'Password is required';
                             }
                             return null;
                           },

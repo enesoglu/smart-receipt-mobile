@@ -43,17 +43,17 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Fişi Sil'),
-        content: Text('${receipt.storeName} fişini silmek istediğinize emin misiniz?'),
+        title: const Text('Delete Receipt'),
+        content: Text('Are you sure you want to delete the receipt from ${receipt.storeName}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -66,7 +66,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Fiş silindi'),
+              content: Text('Receipt deleted'),
               backgroundColor: Colors.green,
             ),
           );
@@ -83,7 +83,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Fişlerim',
+          'My Receipts',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Henüz fiş eklenmemiş',
+                                'No receipts added yet',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[600],
@@ -128,7 +128,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Yeni fiş eklemek için + butonuna tıklayın',
+                                'Tap the + button to add a new receipt',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[500],
@@ -170,7 +170,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'Toplam',
+                                'Total',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey,
@@ -267,6 +267,23 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                       color: Colors.grey[600],
                     ),
                   ),
+                  if (receipt.categoryName != null && receipt.categoryName!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4A6CFA).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        receipt.categoryName!,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF4A6CFA),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

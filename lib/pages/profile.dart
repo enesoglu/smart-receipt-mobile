@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'login.dart';
+import 'categories_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,17 +17,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Hesabınızdan çıkış yapmak istediğinize emin misiniz?'),
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Çıkış'),
+            child: const Text('Log Out'),
           ),
         ],
       ),
@@ -52,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Profil',
+          'Profile',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -86,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _apiService.username ?? 'Kullanıcı',
+                    _apiService.username ?? 'User',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -112,33 +113,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   _buildMenuItem(
+                    icon: Icons.category_outlined,
+                    title: 'Categories',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                      );
+                    },
+                  ),
+                  _buildDivider(),
+                  _buildMenuItem(
                     icon: Icons.notifications_outlined,
-                    title: 'Bildirimler',
+                    title: 'Notifications',
                     onTap: () {},
                   ),
                   _buildDivider(),
                   _buildMenuItem(
                     icon: Icons.palette_outlined,
-                    title: 'Görünüm',
+                    title: 'Appearance',
                     onTap: () {},
                   ),
                   _buildDivider(),
                   _buildMenuItem(
                     icon: Icons.language_outlined,
-                    title: 'Dil',
-                    trailing: 'Türkçe',
+                    title: 'Language',
+                    trailing: 'English',
                     onTap: () {},
                   ),
                   _buildDivider(),
                   _buildMenuItem(
                     icon: Icons.lock_outline,
-                    title: 'Gizlilik ve Güvenlik',
+                    title: 'Privacy & Security',
                     onTap: () {},
                   ),
                   _buildDivider(),
                   _buildMenuItem(
                     icon: Icons.storage_outlined,
-                    title: 'Depolama',
+                    title: 'Storage',
                     onTap: () {},
                   ),
                 ],
@@ -152,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white,
               child: _buildMenuItem(
                 icon: Icons.logout,
-                title: 'Çıkış Yap',
+                title: 'Log Out',
                 iconColor: Colors.red,
                 textColor: Colors.red,
                 showArrow: false,
